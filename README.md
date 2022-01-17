@@ -1,4 +1,4 @@
-# Hondamane Test Wallet (Based of Tique)
+# Hondamane Test Wallet (Based off Tique)
 
 ## NOTICE
 This repo is a fork of Mr. Josh Henslee's (jdh7190) Tique Case Wallet
@@ -24,7 +24,7 @@ The intention of this wallet is to provide an open-sourced wallet that allows ba
 To install, clone via:
 
 ```
-git clone https://github.com/jdh7190/tique_case.git
+git clone https://github.com/kgronemann/tique_case.git
 ```
 
 ## Getting Started
@@ -215,8 +215,10 @@ These functions are available via the UI on the Settings page.
 
 The Transfer function has a use-case for receiving payments based on ownership of a Jig (ex. Revenue share payments, tips etc.)
 
-Feel free to fork this repo, open issues or make pull requests.
+**Feel free to fork this repo**, open issues or make pull requests.
 
 Contact [@cryptoacorns](https://twitter.com/cryptoAcorns) on Twitter.
 
-The wallet code is open-source however the design (HTML and CSS) are copyrighted by DuckCreation.
+**The wallet code is open-source however the design (HTML and CSS) are copyrighted by DuckCreation.**
+
+This software is provided as-is by KG [@H10ndamane](https://twitter.com/H10ndamane) with no warranty or liability assumed by the creator.
