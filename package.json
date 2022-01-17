@@ -1,5 +1,5 @@
 {
-  "name": "tiquecase",
+  "name": "hmtest",
   "version": "1.0.0",
   "description": "Open-source Bitcoin SV web wallet that manages Tokens and Jigs on the RUN protocol",
   "main": "server.js",
