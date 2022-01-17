@@ -1,4 +1,4 @@
-var unit = 'USD', wallet = 'purse', jigsCount = 0, balElem = document.getElementById('bsvBalance'), jigsbtn = document.getElementById('sendjigs');
+var unit = 'USD', wallet = 'purse', jigsCount = 0, balElem = document.getElementById('bsvBalance'), jigsbtn = document.getElementById('sendjigs'), burnbtn = document.getElementById('burnjigs');
 var inputAddr = document.getElementById('purseAddr'), ownerAddr = document.getElementById('ownerAddr'), jigs = [], contracts = [], constructors = [];
 Run.util.sha256 = async h => {return new Uint8Array(await crypto.subtle.digest('SHA-256', h))}
 const qrCode = (e, value) => {
@@ -67,6 +67,11 @@ const loadToken = async loc => {
 insertJig = jig => {
     if (typeof jig === 'object') {
         const jigIdx = jigs.findIndex(i => i.location === jig.location);
+
+        //KRG WAS HERE
+        //console.log(`${jig.location}`);
+
+
         if (jigIdx < 0) { jigs.push(jig) }
         const conIdx = constructors.findIndex(i => i.location === jig.constructor.origin);
         if (conIdx < 0) { constructors.push(jig.constructor) }
@@ -113,6 +118,11 @@ const initWallet = () => {
         const loc = document.querySelector('input[name="jigs"]:checked').id;
         sendCache(loc);
         location.href = `./send.html?loc=${loc}`;
+    });
+    burnbtn.addEventListener('click', () => {
+        const loc = document.querySelector('input[name="jigs"]:checked').id;
+        sendCache(loc);
+        location.href = `./burn.html?loc=${loc}`;
     });
     qrCode('qrAddr', run.purse.address);
     listenTx(run.purse.address);
@@ -253,6 +263,7 @@ const addToList = (contract, loc, balance, def) => {
 }
 const highlight = (el, ft, origin, location) => {
     jigsbtn.style.background = '#F4C51D';
+    burnbtn.style.background = '#F4C51D';
     const radios = document.querySelectorAll(`input[name='jigs']`);
     for (let i = 0; i < radios.length; i++) {
         document.getElementById(`${radios[i].parentElement.id}`).style.background = '';

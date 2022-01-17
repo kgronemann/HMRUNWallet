@@ -1,10 +1,19 @@
-# Tique Case Wallet
+# Hondamane Test Wallet (Based of Tique)
+
+## NOTICE
+This repo is a fork of Mr. Josh Henslee's (jdh7190) Tique Case Wallet
+I am experimenting with RUN functionality and Mr. Henslee is an excellent teacher
+If he requests it, I will remove this repo.
+
+This wallet is not intended for public use, though it is just as functional as Tique. 
+I will be expanding greatly upon this project but I will be sure to request JDH's permission before a formal release.
+
 
 ## Introduction
 
 The Tique Case is an open-source Bitcoin SV web wallet to send and receive Jigs using the Run on Bitcoin protocol.
 
-Tique Case is a 100% client-side wallet that requires no back-end, relying only on external APIs such as RUN Connect or WhatsOnChain to interact with the blockchain.
+Tique is a 100% client-side wallet that requires no back-end, relying only on external APIs such as RUN Connect or WhatsOnChain to interact with the blockchain.
 
 Private keys and the wallet's seed phrase are stored in the browser (localStorage) and never exposed externally.
 
@@ -45,7 +54,7 @@ In scripts/config.js the following configuration settings are available:
 | ownerPath | Derivation path for owner private key | m/0/0 | Any valid derivation path |
 | pursePath | Derivation path for purse private key | m/0/1 | Any valid derivation path |
 | feePerKb | Satoshis per kilobyte to pay for transactions | 500 | Lower than 500 may not be accepted by the network |
-| app | See [here](https://run.network/docs/#api-reference-run-app) for details. | Tique Case | String of application name |
+| app | See [here](https://run.network/docs/#api-reference-run-app) for details. | HManeTest | String of application name |
 | splits | Number of UTXOs to split purse outputs into | 1 | Integer value, ex. 10 |
 | api | Blockchain API to fetch Run transaction from | run | 'run', 'mattercloud' or 'whatsonchain' |
 | bc | Blockchain API for the purse wallet | 'mattercloud' | 'run', 'mattercloud' or 'whatsonchain'  |

@@ -226,4 +226,35 @@ const destroyJig = async location => {
     })
     const rawtx = await tx.export();
     console.log(rawtx)
+    return(rawtx)
 }
+
+
+//KG Methods
+const readBack = async (location1,location2) => {
+    const jig1 = await run.load(location1);
+    await jig1.sync();
+    const jig2 = await run.load(location2);
+    await jig2.sync();
+    console.log(location1 + "\n" + location2)
+}
+/*
+This doesn't work lol
+const doubleDestroy = async (location1,location2) => {
+    const jig1 = await run.load(location1);
+    await jig1.sync();
+    const jig2 = await run.load(location2);
+    await jig2.sync();
+    console.log(`I AM GOING TO DESTROY THESE TWO JIGS:\n
+    ${location1}\n
+    ${location2}\n
+    Say goodbye!`)
+    const tx = new Run.Transaction();
+    tx.update(() => {
+        jig1.destroy();
+        jig2.destroy();
+    })
+    const rawtx = await tx.export();
+    console.log(rawtx)
+}
+*/

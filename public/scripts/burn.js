@@ -1,0 +1,156 @@
+const urlParams = new URLSearchParams(location.search);
+var enforceAmt = true, tokens = [];
+initRun();
+run.trust(urlParams.get('loc').substr(0,64));
+trustContracts(run);
+const loadToken = async(loc) => {
+    let balance = 0;
+    let contract = await run.load(loc);
+    if (contract?.deps?.Token) {
+        const sending = JSON.parse(localStorage.getItem('sending'));
+        for (let loc of sending) {
+            let jig = await run.load(loc);
+            tokens.push(jig);
+        }
+        if (tokens.length) {
+            tokens.forEach(coin => { balance += coin.amount });
+            addToList(contract, loc, balance);
+            if (contract.decimals > 0) {
+                document.getElementById('sendamt').step = 1 / Math.pow(10, contract.decimals > 6 ? contract.decimals - 2 : contract.decimals);
+                document.getElementById('sendamt').value = 1 / Math.pow(10, contract.decimals > 6 ? contract.decimals - 2 : contract.decimals);
+            }
+        }
+    }
+    else {
+        let j = await run.load(loc), contract = j.constructor;
+        addToList(j, loc, 0, contract);
+    }
+}
+const addToList = (contract, loc, balance, def) => {
+    let row = document.createElement('p');
+    let emojiSpan = document.createElement('span');
+    emojiSpan.className = "emoji";
+    emojiSpan = setImage(emojiSpan, contract?.metadata, def, contract.origin);
+    row.appendChild(emojiSpan);
+    let nameSpan = document.createElement('span');
+    nameSpan.id = 'contractName';
+    nameSpan.className = 'contractName';
+    nameSpan = setName(nameSpan, contract, def, loc, network, def ? true : false);
+    row.appendChild(nameSpan);
+    if (balance) {
+        document.getElementById('tokenamt').style.display = 'block';
+        let bal = document.createElement('span');
+        bal.className = "tokenBalance";
+        if (contract.decimals > 0) {
+            balance = balance / Math.pow(10, contract.decimals);
+        }
+        bal.innerText = balance;
+        row.appendChild(bal);
+    }
+    else { enforceAmt = false }
+    let tokensDiv = document.getElementById('tokens');
+    tokensDiv.appendChild(row);
+}
+
+
+const burnTokens = async() => {
+    try {
+        let jig = await run.load(urlParams.get('loc'));
+        const rawtx = await destroyJig(urlParams.get('loc'))
+        let data = {txhex: rawtx};
+
+        let response = await fetch("https://api.whatsonchain.com/v1/bsv/main/tx/raw", {
+            method: "POST",
+            headers: {'Content-Type': 'application/json'}, 
+            body: JSON.stringify(data)
+        })
+        if (response.ok){
+            console.log("Request complete! response:", response.status);
+            let rtext = await response.text();
+            //let text = JSON.parse(jtext);
+            var text = rtext.replace(/['"]+/g, '');
+            let url = "https://whatsonchain.com/tx/"+text;
+            console.log(url);
+            document.getElementById('jigscon').style.display = 'none';
+            document.getElementById('confirm').style.display = 'block';
+            document.getElementById('confirmation').href = url;
+        }else{
+            alert("HTTP ERROR: " + response.status);
+        }
+    }
+    catch (e) {
+        if (e.length === 0) {
+            alert('Please confirm you have enough funds in the purse to pay for the transaction.')
+        } else { alert(e) }
+    }
+
+
+}
+
+const sendTokens = async() => {
+    let amt = document.getElementById('sendamt').value, pubkey = document.getElementById('sendaddr').value, pmail = false;
+    if (enforceAmt) { if (!amt) { alert('Please specify an Amount to Send.'); return } }
+    const validAddr = bsv.Address.isValid(pubkey);
+    if ((pubkey.includes('@') || (pubkey.includes('1') && !validAddr) && enableRelayXPaymail)) {
+        let address = await getAddress(validateHandle(pubkey));
+        pubkey = address?.length > 0 ? address : '';
+        pmail = true;
+    }
+    else {
+        if (!validAddr) { alert('Please specify a valid Address or alias.'); return }
+    }
+    if (!pubkey) { alert('Please specify a valid Address or alias.'); return }
+    let contract = await run.load(urlParams.get('loc'));
+    //await contract.sync();
+    if (contract?.interactive === undefined) { contract = contract.constructor }
+    /* if (contract?.interactive !== false && pmail) {
+        alert('Cannot send Interactive Tokens/Jigs to paymail!');
+        return;
+    } */
+    if (contract?.deps?.Token) {
+        try {
+            const tx = new Run.Transaction();
+            if (contract.decimals > 0) { amt = parseFloat(amt) * Math.pow(10, contract.decimals) }
+            else { amt = parseInt(amt) }
+            if (amt) {
+                if (tokens.length > 1) { tx.update(() => tokens[0].combine(...tokens.slice(1))) }
+                tx.update(() => tokens[0].send(pubkey, amt));
+                await tx.publish();
+                if (tx) {
+                    document.getElementById('jigscon').style.display = 'none';
+                    document.getElementById('confirm').style.display = 'block';
+                    document.getElementById('confirmation').href = `https://run.network/explorer/?query=${tokens[0].location.substr(0,64)}&network=${network}`;
+                }
+            }
+            else { throw 'Amount is incorrect.' }
+        }
+        catch (e) {
+            if (e.length === 0) {
+                alert('Please confirm you have enough funds in the purse to pay for the transaction.')
+            } else { alert(e) }
+        }
+    }
+    else {
+        if (pmail && !contract.deps.RelayNFT) {
+            alert('Cannot send Jigs (NFTs) to paymails. Please enter BSV address.');
+            return;
+        }
+        try {
+            let jig = await run.load(urlParams.get('loc'));
+            jig.send(pubkey);
+            await jig.sync();
+            if (jig.owner === pubkey) {
+                document.getElementById('jigscon').style.display = 'none';
+                document.getElementById('confirm').style.display = 'block';
+                document.getElementById('confirmation').href = `https://run.network/explorer/?query=${jig.location.substr(0,64)}&network=${network}`;
+            }
+        }
+        catch (e) {
+            if (e.length === 0) {
+                alert('Please confirm you have enough funds in the purse to pay for the transaction.')
+            } else { alert(e) }
+        }
+    }
+}
+loadToken(urlParams.get('loc'));
+document.getElementById('burnjig').addEventListener('click', burnTokens);

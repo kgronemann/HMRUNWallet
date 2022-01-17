@@ -1,6 +1,6 @@
 {
-    "name": "Tique Case",
-    "short_name": "Tique Case",
+    "name": "HManeTest",
+    "short_name": "HManeTest",
     "orientation": "portrait",
     "scope": "./",
     "icons": [
